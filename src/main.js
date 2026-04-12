@@ -1,8 +1,5 @@
-import './index.css';
-import { createIcons, LayoutDashboard, Video, History, Thermometer, Wind, Flame, HelpCircle, Terminal, VideoOff, ArrowRight } from 'lucide';
-
 // State
-let activeView: 'dashboard' | 'cameras' | 'history' = 'dashboard';
+let activeView = 'dashboard';
 let isSidebarOpen = false;
 
 // Elements
@@ -14,7 +11,7 @@ const homeBtn = document.getElementById('home-btn');
 const navButtons = document.querySelectorAll('.nav-btn');
 
 // Templates
-const sensorCardTemplate = (title: string, value: string | number, unit: string, icon: string, status: string, statusColor: string) => `
+const sensorCardTemplate = (title, value, unit, icon, status, statusColor) => `
   <div class="bg-surface-high p-6 rounded-xl border border-outline-variant/5 shadow-xl relative overflow-hidden group opacity-0 translate-y-4 transition-all duration-500 ease-out" data-animate="true">
     <div class="absolute top-0 left-0 p-4">
       <i data-lucide="${icon}" class="w-8 h-8 ${statusColor}"></i>
@@ -117,21 +114,10 @@ function render() {
     }
   });
 
-  // Re-initialize icons
-  createIcons({
-    icons: {
-      LayoutDashboard,
-      Video,
-      History,
-      Thermometer,
-      Wind,
-      Flame,
-      HelpCircle,
-      Terminal,
-      VideoOff,
-      ArrowRight
-    }
-  });
+  // Re-initialize icons using global lucide object from CDN
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 
   // Simple animations
   setTimeout(() => {
@@ -141,7 +127,7 @@ function render() {
   }, 50);
 }
 
-function setView(view: typeof activeView) {
+function setView(view) {
   activeView = view;
   render();
   if (window.innerWidth < 768) {
@@ -149,7 +135,7 @@ function setView(view: typeof activeView) {
   }
 }
 
-function toggleSidebar(open: boolean) {
+function toggleSidebar(open) {
   isSidebarOpen = open;
   if (isSidebarOpen) {
     sidebar?.classList.remove('translate-x-full');
@@ -166,7 +152,7 @@ sidebarOverlay?.addEventListener('click', () => toggleSidebar(false));
 homeBtn?.addEventListener('click', () => setView('dashboard'));
 navButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    const view = btn.getAttribute('data-view') as any;
+    const view = btn.getAttribute('data-view');
     setView(view);
   });
 });
