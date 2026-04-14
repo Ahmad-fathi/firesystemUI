@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { 
-  LayoutDashboard, 
-  Video, 
-  History, 
-  Bell, 
-  UserCircle, 
-  Thermometer, 
-  Wind, 
-  Flame, 
-  HelpCircle, 
-  Terminal, 
+import {
+  LayoutDashboard,
+  Video,
+  History,
+  Bell,
+  UserCircle,
+  Thermometer,
+  Wind,
+  Flame,
+  HelpCircle,
+  Terminal,
   CheckCircle2,
   User,
   VideoOff,
@@ -22,15 +22,15 @@ import {
 import { motion } from 'motion/react';
 import { useState } from 'react';
 
-const SensorCard = ({ title, value, unit, icon: Icon, status, statusColor }: { 
-  title: string; 
-  value: string | number; 
-  unit?: string; 
-  icon: any; 
+const SensorCard = ({ title, value, unit, icon: Icon, status, statusColor }: {
+  title: string;
+  value: string | number;
+  unit?: string;
+  icon: any;
   status: string;
   statusColor: string;
 }) => (
-  <motion.div 
+  <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     className="bg-surface-high p-6 rounded-xl border border-outline-variant/5 shadow-xl relative overflow-hidden group"
@@ -53,7 +53,8 @@ const SensorCard = ({ title, value, unit, icon: Icon, status, statusColor }: {
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'cameras' | 'history'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'cameras' | 'history' | 'camera-detail'>('dashboard');
+  const [selectedCamera, setSelectedCamera] = useState<number | null>(null);
 
   const renderContent = () => {
     switch (activeView) {
@@ -62,7 +63,7 @@ export default function App() {
           <div className="space-y-8">
             {/* Sensors Grid */}
 
-                        {/* Simplified Camera Access Section */}
+            {/* Simplified Camera Access Section */}
             <section className="bg-surface-low rounded-xl p-8 border border-outline-variant/10 shadow-2xl">
               <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="space-y-2 text-center md:text-right">
@@ -72,7 +73,7 @@ export default function App() {
                   </h2>
                   <p className="text-slate-400">يمكنك مراقبة جميع الزوايا والقطاعات من خلال البث المباشر المشفر.</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setActiveView('cameras')}
                   className="bg-primary-container text-on-primary px-8 py-4 rounded-xl font-bold uppercase tracking-widest flex items-center gap-3 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-container/20"
                 >
@@ -82,27 +83,27 @@ export default function App() {
               </div>
             </section>
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <SensorCard 
-                title="مستشعر الحرارة" 
-                value={24} 
-                unit="°م" 
-                icon={Thermometer} 
-                status="نطاق طبيعي" 
+              <SensorCard
+                title="مستشعر الحرارة"
+                value={24}
+                unit="°م"
+                icon={Thermometer}
+                status="نطاق طبيعي"
                 statusColor="text-secondary"
               />
-              <SensorCard 
-                title="مستشعر الغاز" 
-                value={12} 
-                unit="%" 
-                icon={Wind} 
-                status="حالة آمنة" 
+              <SensorCard
+                title="مستشعر الغاز"
+                value={12}
+                unit="%"
+                icon={Wind}
+                status="حالة آمنة"
                 statusColor="text-secondary"
               />
-              <SensorCard 
-                title="مستشعر اللهب" 
-                value="لم يتم رصد لهب" 
-                icon={Flame} 
-                status="قيد المراقبة" 
+              <SensorCard
+                title="مستشعر اللهب"
+                value="لم يتم رصداي لهب"
+                icon={Flame}
+                status="قيد المراقبة"
                 statusColor="text-secondary"
               />
             </section>
@@ -114,7 +115,7 @@ export default function App() {
         return (
           <div className="space-y-8">
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => setActiveView('dashboard')}
                 className="p-2 bg-surface-high rounded-lg text-slate-400 hover:text-white transition-colors flex items-center gap-2"
               >
@@ -124,10 +125,17 @@ export default function App() {
               <h1 className="text-4xl font-bold font-headline tracking-tight text-white">بث الكاميرات المباشر</h1>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[1, 2, 3, 4].map((id) => (
-                <div key={id} className="relative aspect-video bg-surface-lowest rounded-2xl border border-outline-variant/10 overflow-hidden group shadow-2xl">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-transparent to-black/40 z-10">
-                    <motion.div 
+              {[1, 2].map((id) => (
+                <div
+                  key={id}
+                  onClick={() => {
+                    setSelectedCamera(id);
+                    setActiveView('camera-detail');
+                  }}
+                  className="relative aspect-video bg-surface-lowest rounded-2xl border border-outline-variant/10 overflow-hidden group shadow-2xl cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center ">
+                    <motion.div
                       whileHover={{ scale: 1.1 }}
                       className="w-16 h-16 rounded-full bg-surface-highest/50 border border-outline-variant/20 flex items-center justify-center mb-4"
                     >
@@ -139,20 +147,62 @@ export default function App() {
                     <div className="w-2 h-2 rounded-full bg-error animate-pulse"></div>
                     <span className="text-[10px] font-mono font-bold text-white/50 tracking-widest">CAM_0{id}</span>
                   </div>
-                  <div className="absolute inset-0 grayscale opacity-20 group-hover:opacity-40 transition-opacity">
-                    <img 
-                      src={`https://picsum.photos/seed/cam${id}/800/450`} 
-                      alt={`Camera ${id}`} 
+                  <div className="absolute inset-0 grayscale  group-hover:opacity-40 transition-opacity">
+                    <img
+                      src={id === 1 ? `http://127.0.0.1:5000/video_mobile` : `http://127.0.0.1:5000/video_laptop`}
+                      alt={`Camera ${id}`}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                     />
                   </div>
+
                 </div>
               ))}
             </div>
           </div>
         );
 
+      case 'camera-detail':
+        return (
+          <div className="space-y-8">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setActiveView('cameras')}
+                className="p-2 bg-surface-high rounded-lg text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+              >
+                <ArrowRight className="w-6 h-6" />
+                <span className="text-sm font-bold">رجوع للكاميرات</span>
+              </button>
+              <h1 className="text-4xl font-bold font-headline tracking-tight text-white">بث مباشر: كاميرا {selectedCamera}</h1>
+            </div>
+
+            <div className="w-full space-y-6">
+              <div className="fixed inset-0 z-[100] bg-black flex flex-col md:relative md:block md:inset-auto md:z-auto md:bg-black md:rounded-3xl md:border md:border-outline-variant/20 md:shadow-2xl w-full md:aspect-video overflow-hidden">
+
+                {/* Mobile Top Bar */}
+                <div className="md:hidden absolute top-0 left-0 right-0 p-6 z-[110] flex items-center justify-start bg-gradient-to-b from-black/80 to-transparent">
+                  <button
+                    onClick={() => setActiveView('cameras')}
+                    className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition-colors"
+                  >
+                    <ArrowRight className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <div className="w-full h-full relative">
+                  <img
+                    src={selectedCamera === 1 ? `http://127.0.0.1:5000/video_mobile` : `http://127.0.0.1:5000/video_laptop`}
+                    alt={`Camera ${selectedCamera} Full View`}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -161,14 +211,14 @@ export default function App() {
       {/* Top Navigation Bar */}
       <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-surface border-b border-outline-variant/15">
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
           >
             <LayoutDashboard className="w-6 h-6" />
           </button>
           {activeView !== 'dashboard' && (
-            <button 
+            <button
               onClick={() => setActiveView('dashboard')}
               className="hidden md:flex p-2 text-slate-400 hover:text-white transition-colors items-center gap-2"
             >
@@ -182,18 +232,16 @@ export default function App() {
             <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">النظام: مستقر</span>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-6">
-          <button className="hidden md:block text-slate-400 font-medium hover:text-white transition-colors text-sm uppercase tracking-widest">
-            تجاوز الطوارئ
-          </button>
+
         </div>
       </header>
 
       <div className="flex flex-1 pt-16">
         {/* Mobile Sidebar Overlay */}
         {isSidebarOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
@@ -208,23 +256,23 @@ export default function App() {
           <div className="px-6 mb-8">
             <h2 className="text-lg font-black text-white font-headline uppercase tracking-tighter">التحكم في النظام</h2>
           </div>
-          
+
           <nav className="flex-1">
-            <button 
+            <button
               onClick={() => { setActiveView('dashboard'); setIsSidebarOpen(false); }}
               className={`${activeView === 'dashboard' ? 'bg-surface-high text-primary-container border-l-4 border-primary-container' : 'text-slate-500'} w-full flex items-center px-6 py-4 transition-all duration-300 ease-out group`}
             >
               <LayoutDashboard className="w-5 h-5 ml-4" />
               <span className="text-sm uppercase tracking-widest">لوحة التحكم</span>
             </button>
-            <button 
+            <button
               onClick={() => { setActiveView('cameras'); setIsSidebarOpen(false); }}
               className={`${activeView === 'cameras' ? 'bg-surface-high text-primary-container border-l-4 border-primary-container' : 'text-slate-500'} w-full flex items-center px-6 py-4 transition-all duration-300 ease-out group`}
             >
               <Video className="w-5 h-5 ml-4" />
               <span className="text-sm uppercase tracking-widest">بث الكاميرات</span>
             </button>
-            <button 
+            <button
               onClick={() => { setActiveView('history'); setIsSidebarOpen(false); }}
               className={`${activeView === 'history' ? 'bg-surface-high text-primary-container border-l-4 border-primary-container' : 'text-slate-500'} w-full flex items-center px-6 py-4 transition-all duration-300 ease-out group`}
             >
